@@ -103,12 +103,15 @@ class TeamsController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
-    public function update(StoreTeamRequest $request, Team $team)
+    public function update(StoreTeamRequest $request, $id)
     {
-        $team->update($request->validated());
-        return $this->isNotAuthorized($team) ? $this->isNotAuthorized($team) : new TeamsResource($team);
+        $team = Team::find($id);
+        if ($team){
+            $team->update($request->validated());
+            return $this->isNotAuthorized($team) ?: new TeamsResource($team);
+        }
+        return response()->json('Team not found');
     }
 
     /**
