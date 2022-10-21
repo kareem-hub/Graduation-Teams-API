@@ -22,113 +22,103 @@ class TeamsController extends Controller
     public function index()
     {
         return Team::paginate(5);
-
-        // with sorting
-        // $sortColumn = $request->input('sort', 'name');
-        // $sortDirection = startsWith($sortColumn, '-') ? 'desc' : 'asc';
-        // $sortColumn = ltrim($sortColumn, '-');
-
-        // return Team::orderBy($sortColumn, $sortDirection)
-        //     ->paginate(5);
-
-        // with sorting using multiple columns
-        // $sorts = explode(',', $request->input('sort', ''));
-        // $teams = Team::query();
-
-        // foreach ($sorts as $sortColumn) {
-        //     $sortDirection = startsWith($sortColumn, '-') ? 'desc' : 'asc';
-        //     $sortColumn = ltrim($sortColumn, '-');
-
-        //     $teams->orderBy($sortColumn, $sortDirection);
-        // }
-
-        // return $teams->paginate(5);
-
-        // with filtering
-        // $query = Team::query();
-
-        // $query->when($request->filled('filter'), function ($query) {
-        //     // with single filter
-        //     [$criteria, $value] = explode(':', $request('filter'));
-        //     return $query->where($criteria, $value);
-
-        //     // with multiple filters
-        //     $filters = explode(',', $request('filter'));
-        //     foreach ($filters as $filter) {
-        //         [$criteria, $value] = explode(':', $filter);
-        //         $query->where($criteria, $value);
-        //     }
-
-        //     return $query;
-        // });
-        // return $query->paginate(5);
     }
 
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
      */
     public function store(StoreTeamRequest $request)
     {
-        $request->validated();
-
-        if (Auth::user()->team) {
-            return $this->error('', 'A user can only have one team', 403);
+        if ($request->user()->team) {
+            return response()->json([
+                'message' => 'The user with user ID: ' . $request->user()->id . ' already has a team.'
+            ], 403);
         }
 
         $team = Team::create([
-            'user_id' => Auth::user()->id,
+            'user_id' => $request->user()->id,
             'name' => $request->name,
             'body' => $request->body
         ]);
 
-        return new TeamsResource($team);
+        return response()->json([
+            'message' => 'Created.',
+            'Team' => new TeamsResource($team)
+        ],200);
     }
 
     /**
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
-    public function show(Team $team)
+    public function show(int $id)
     {
-        return new TeamsResource($team);
+        $team = Team::find($id);
+        if ($team){
+            return new TeamsResource($team);
+        }
+        return response()->json([
+            'message' => 'Team not found.'
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param int $id
      */
-    public function update(StoreTeamRequest $request, $id)
+    public function update(StoreTeamRequest $request, int $id)
     {
         $team = Team::find($id);
-        if ($team){
-            $team->update($request->validated());
-            return $this->isNotAuthorized($team) ?: new TeamsResource($team);
+        if ($team) {
+            if ($this->isAuthorized($team)) {
+                $team->update($request->validated());
+                return response()->json([
+                    'message' => 'Updated.'
+                ]);
+            }
+            return response()->json([
+                'message' => 'Not Authorized.'
+            ]);
         }
-        return response()->json('Team not found');
+
+        return response()->json([
+            'message' => 'Team Not Found.'
+        ]);
     }
 
     /**
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse|void
      */
-    public function destroy(Team $team)
+    public function destroy(int $id)
     {
-        return $this->isNotAuthorized($team) ? $this->isNotAuthorized($team) : $team->delete();
+        $team = Team::find($id);
+        if ($team) {
+            if ($this->isAuthorized($team)) {
+                $team->delete();
+                return response()->json([
+                    'message' => 'Deleted.'
+                ]);
+            }
+            return response()->json([
+                'message' => 'Not Authorized.'
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Team not found'
+        ]);
     }
 
-    private function isNotAuthorized($team)
+    private function isAuthorized(Team $team)
     {
-        if (Auth::user()->id !== $team->user_id) {
-            return $this->error('', 'Unauthorized to take action on this team', 403);
-        }
+        return Auth::user()->id === $team->user_id;
     }
 }

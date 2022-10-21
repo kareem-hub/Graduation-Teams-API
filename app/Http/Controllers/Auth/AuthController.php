@@ -40,9 +40,6 @@ class AuthController extends Controller
 
     public function register(StoreUserRequest $request)
     {
-
-        $request->validated();
-
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
