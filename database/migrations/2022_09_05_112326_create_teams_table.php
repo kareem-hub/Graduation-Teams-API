@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id')->unique();
             $table->string('name');
-            $table->string('content');
+            $table->longText('body');
             $table->foreign('user_id')
                 ->references('id')
                 ->on('users')

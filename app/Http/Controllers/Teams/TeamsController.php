@@ -81,7 +81,7 @@ class TeamsController extends Controller
         $team = Team::create([
             'user_id' => Auth::user()->id,
             'name' => $request->name,
-            'content' => $request->content
+            'body' => $request->body
         ]);
 
         return new TeamsResource($team);
@@ -105,10 +105,9 @@ class TeamsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Team $team)
+    public function update(StoreTeamRequest $request, Team $team)
     {
-        $team->update($request->all());
-
+        $team->update($request->validated());
         return $this->isNotAuthorized($team) ? $this->isNotAuthorized($team) : new TeamsResource($team);
     }
 
@@ -126,7 +125,7 @@ class TeamsController extends Controller
     private function isNotAuthorized($team)
     {
         if (Auth::user()->id !== $team->user_id) {
-            return $this->error('', 'Unauthorized to delete this team', 403);
+            return $this->error('', 'Unauthorized to take action on this team', 403);
         }
     }
 }

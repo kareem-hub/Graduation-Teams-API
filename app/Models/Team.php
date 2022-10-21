@@ -12,7 +12,7 @@ class Team extends Model
     protected $fillable = [
         'user_id',
         'name',
-        'content',
+        'body',
     ];
 
     public function user()

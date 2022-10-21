@@ -18,7 +18,7 @@ class TeamsResource extends JsonResource
             'id' => (string)$this->id,
             'atributes' => [
                 'name' => (string)$this->name,
-                'content' => (string)$this->content,
+                'body' => (string)$this->body,
                 'created_at' => $this->created_at,
                 'updated_at' => $this->updated_at,
             ],
