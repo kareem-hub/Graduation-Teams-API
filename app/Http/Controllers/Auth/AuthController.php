@@ -19,23 +19,19 @@ class AuthController extends Controller
 
     public function login(LoginUserRequest $request)
     {
-        $request->validated();
-
-        // check if there was a successful login attempt
         if (!Auth::attempt($request->only(['email', 'password']))) {
-            return $this->error('', 'Credintials do not match any record', 401);
+            return response()->json([
+                'message' => 'Credentials do not match'
+            ], 401);
         }
 
         $user = User::where('email', $request->email)
             ->first();
 
-        return $this->success([
+        return response()->json([
             'user' => $user,
             'token' => $user->createToken('Token of ' . $user->name)->plainTextToken
-        ]);
-
-
-        return response()->json('this is login');
+        ], 200);
     }
 
     public function register(StoreUserRequest $request)
@@ -46,18 +42,18 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        return $this->success([
+        return response()->json([
             'user' => $user,
-            'token' => $user->createToken('API Auth token of ' . $user->name)->plainTextToken
-        ]);
+            'token' => $user->createToken('Token of ' . $user->name)->plainTextToken
+        ], 200);
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
-        Auth::user()->currentAccessToken()->delete();
+        $request->user()->currentAccessToken()->delete();
 
-        return $this->success([
-            'message' => 'Logged out successfully'
-        ]);
+        return response()->json([
+            'message' => 'Logged out.'
+        ], 200);
     }
 }
