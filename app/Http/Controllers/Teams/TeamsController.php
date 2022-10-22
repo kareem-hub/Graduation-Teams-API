@@ -84,7 +84,7 @@ class TeamsController extends Controller
                 $team->update($request->validated());
                 return response()->json([
                     'message' => 'Updated.',
-                    'team' => new TeamsResource($team)
+                    new TeamsResource($team)
                 ], 200);
             }
             return response()->json([
