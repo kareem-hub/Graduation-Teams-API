@@ -83,12 +83,13 @@ class TeamsController extends Controller
             if ($this->isAuthorized($request, $team)) {
                 $team->update($request->validated());
                 return response()->json([
-                    'message' => 'Updated.'
-                ]);
+                    'message' => 'Updated.',
+                    'team' => new TeamsResource($team)
+                ], 200);
             }
             return response()->json([
-                'message' => 'Not Authorized.'
-            ]);
+                'message' => 'Unauthorized.'
+            ], 401);
         }
 
         return response()->json([
