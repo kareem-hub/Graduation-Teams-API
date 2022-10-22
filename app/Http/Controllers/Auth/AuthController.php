@@ -25,6 +25,12 @@ class AuthController extends Controller
             ], 401);
         }
 
+        if (Auth::check()){
+            return response()->json([
+                'message' => 'User is already logged in.',
+            ], 200);
+        }
+
         $user = User::where('email', $request->email)
             ->first();
 
