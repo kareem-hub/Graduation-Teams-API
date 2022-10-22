@@ -17,12 +17,16 @@ class TeamsController extends Controller
 
     /**
      * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function index()
     {
-        return TeamsResource::collection(Team::paginate(5));
+        $result = Team::paginate(5);
+        if ($result->isEmpty()){
+            return response()->json([
+                'message' => 'No teams yet'
+            ]);
+        }
+        return TeamsResource::collection($result);
     }
 
     /**
