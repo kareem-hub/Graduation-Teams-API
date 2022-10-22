@@ -80,7 +80,7 @@ class TeamsController extends Controller
     {
         $team = Team::find($id);
         if ($team) {
-            if ($this->isAuthorized($team)) {
+            if ($this->isAuthorized($request, $team)) {
                 $team->update($request->validated());
                 return response()->json([
                     'message' => 'Updated.'
@@ -102,11 +102,11 @@ class TeamsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\JsonResponse|void
      */
-    public function destroy(int $id)
+    public function destroy(Request $request, int $id)
     {
         $team = Team::find($id);
         if ($team) {
-            if ($this->isAuthorized($team)) {
+            if ($this->isAuthorized($request, $team)) {
                 $team->delete();
                 return response()->json([
                     'message' => 'Deleted.'
@@ -122,8 +122,8 @@ class TeamsController extends Controller
         ]);
     }
 
-    private function isAuthorized(Team $team)
+    private function isAuthorized(Request $request = null, Team $team)
     {
-        return Auth::user()->id === $team->user_id;
+        return $request->user()->id === $team->user_id;
     }
 }

@@ -24,8 +24,8 @@ class UpdateTeamRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'unique:teams|max:255',
-            'body' => 'min:2',
+            'name' => 'nullable|unique:teams|max:255',
+            'body' => 'nullable|min:2',
         ];
     }
 }
