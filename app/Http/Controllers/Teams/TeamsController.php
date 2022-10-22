@@ -81,7 +81,10 @@ class TeamsController extends Controller
         $team = Team::find($id);
         if ($team) {
             if ($this->isAuthorized($request, $team)) {
-                $team->update($request->validated());
+                $team->update([
+                    'name' => $request->name ?: $team->name,
+                    'body' => $request->body ?: $team->body,
+                ]);
                 return response()->json([
                     'message' => 'Updated.'
                 ]);
