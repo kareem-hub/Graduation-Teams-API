@@ -17,11 +17,11 @@ class TeamsController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function index()
     {
-        return Team::paginate(5);
+        return TeamsResource::collection(Team::paginate(5));
     }
 
     /**
