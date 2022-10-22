@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Teams;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTeamRequest;
+use App\Http\Requests\UpdateTeamRequest;
 use App\Http\Resources\TeamsResource;
 use App\Http\Traits\HttpResponses;
 use App\Models\Team;
@@ -71,7 +72,7 @@ class TeamsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @param int $id
      */
-    public function update(StoreTeamRequest $request, int $id)
+    public function update(UpdateTeamRequest $request, int $id)
     {
         $team = Team::find($id);
         if ($team) {
