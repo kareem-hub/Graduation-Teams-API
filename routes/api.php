@@ -10,6 +10,11 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::get('/teams', [TeamsController::class, 'index'])->name('teams');
 Route::get('/teams/{team}', [TeamsController::class, 'show'])->name('teams.show');
+Route::get('/users', function (){
+    return response()->json([
+        'users' => \App\Models\User::all()
+    ]);
+})->name('users');
 
 // protected routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
