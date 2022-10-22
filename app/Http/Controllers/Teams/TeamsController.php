@@ -78,26 +78,22 @@ class TeamsController extends Controller
      */
     public function update(UpdateTeamRequest $request, int $id)
     {
-        return $request;
-//        $team = Team::find($id);
-//        if ($team) {
-//            if ($this->isAuthorized($request, $team)) {
-//                $team->update([
-//                    'name' => $request->name ?: $team->name,
-//                    'body' => $request->body ?: $team->body,
-//                ]);
-//                return response()->json([
-//                    'message' => 'Updated.'
-//                ]);
-//            }
-//            return response()->json([
-//                'message' => 'Not Authorized.'
-//            ]);
-//        }
-//
-//        return response()->json([
-//            'message' => 'Team Not Found.'
-//        ]);
+        $team = Team::find($id);
+        if ($team) {
+            if ($this->isAuthorized($request, $team)) {
+                $team->update($request->validated());
+                return response()->json([
+                    'message' => 'Updated.'
+                ]);
+            }
+            return response()->json([
+                'message' => 'Not Authorized.'
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Team Not Found.'
+        ]);
     }
 
     /**
