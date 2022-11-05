@@ -32,7 +32,8 @@ class AuthController extends Controller
 
         return response()->json([
             'user' => $user,
-            'token' => $user->createToken('Token of ' . $user->name)->plainTextToken
+            'team_id' => $user->team?->id,
+            'token' => $user->createToken('Token of ' . $user->name)->plainTextToken,
         ], 200);
     }
 

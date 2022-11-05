@@ -23,10 +23,12 @@ class TeamsController extends Controller
         $result = Team::paginate(5);
         if ($result->isEmpty()){
             return response()->json([
-                'message' => 'No teams yet'
-            ]);
+                'message' => 'No teams yet.'
+            ], 404);
         }
-        return TeamsResource::collection($result);
+        return response()->json([
+            'teams' => TeamsResource::collection($result)
+        ], 200);
     }
 
     /**
@@ -38,19 +40,21 @@ class TeamsController extends Controller
     {
         if ($request->user()->team) {
             return response()->json([
-                'message' => 'The user with user ID: ' . $request->user()->id . ' already has a team.'
+                'message' => 'User with ID: ' . $request->user()->id . ' already has a team.'
             ], 403);
         }
+
+        $request->validated();
 
         $team = Team::create([
             'user_id' => $request->user()->id,
             'name' => $request->name,
-            'body' => $request->body
+            'body' => $request->body,
         ]);
 
         return response()->json([
             'message' => 'Created.',
-            'Team' => new TeamsResource($team)
+            'team' => new TeamsResource($team)
         ],200);
     }
 
@@ -63,11 +67,13 @@ class TeamsController extends Controller
     {
         $team = Team::find($id);
         if ($team){
-            return new TeamsResource($team);
+            return response()->json([
+                'team' => new TeamsResource($team)
+            ], 200);
         }
         return response()->json([
             'message' => 'Team not found.'
-        ]);
+        ], 404);
     }
 
     /**
@@ -84,7 +90,7 @@ class TeamsController extends Controller
                 $team->update($request->validated());
                 return response()->json([
                     'message' => 'Updated.',
-                    new TeamsResource($team)
+                    'team' => new TeamsResource($team)
                 ], 200);
             }
             return response()->json([
@@ -94,7 +100,7 @@ class TeamsController extends Controller
 
         return response()->json([
             'message' => 'Team Not Found.'
-        ]);
+        ], 404);
     }
 
     /**
@@ -111,16 +117,16 @@ class TeamsController extends Controller
                 $team->delete();
                 return response()->json([
                     'message' => 'Deleted.'
-                ]);
+                ], 200);
             }
             return response()->json([
                 'message' => 'Not Authorized.'
-            ]);
+            ], 401);
         }
 
         return response()->json([
-            'message' => 'Team not found'
-        ]);
+            'message' => 'Team not found.'
+        ], 404);
     }
 
     private function isAuthorized(Request $request = null, Team $team)
