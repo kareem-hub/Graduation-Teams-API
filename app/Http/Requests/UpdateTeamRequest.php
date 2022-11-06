@@ -26,6 +26,7 @@ class UpdateTeamRequest extends FormRequest
         return [
             'name' => 'nullable|unique:teams|max:255',
             'body' => 'nullable|min:2',
+            'type' => 'nullable|min:7|max:7',
         ];
     }
 }

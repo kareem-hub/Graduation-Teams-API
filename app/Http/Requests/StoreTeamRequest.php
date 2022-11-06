@@ -26,6 +26,7 @@ class StoreTeamRequest extends FormRequest
         return [
             'name' => 'required|unique:teams|max:255',
             'body' => 'required|min:2',
+            'type' => 'required|min:7|max:7',
         ];
     }
 }

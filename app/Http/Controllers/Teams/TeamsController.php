@@ -18,9 +18,10 @@ class TeamsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $result = Team::paginate(5);
+        $result = Team::where('type', $request->type ?: 'general')
+            ->get();
         if ($result->isEmpty()){
             return response()->json([
                 'message' => 'No teams yet.'
@@ -50,6 +51,7 @@ class TeamsController extends Controller
             'user_id' => $request->user()->id,
             'name' => $request->name,
             'body' => $request->body,
+            'type' => $request->type,
         ]);
 
         return response()->json([
