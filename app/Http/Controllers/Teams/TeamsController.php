@@ -40,7 +40,7 @@ class TeamsController extends Controller
     {
         if ($request->user()->team) {
             return response()->json([
-                'message' => 'User with id: ' . $request->user()->id . ' already has a team id ' . $request->user()->team_id
+                'message' => 'user already has a team'
             ], 403);
         }
 
