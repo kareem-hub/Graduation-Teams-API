@@ -5,134 +5,118 @@ namespace App\Http\Controllers\Teams;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTeamRequest;
 use App\Http\Requests\UpdateTeamRequest;
-use App\Http\Resources\TeamsResource;
+use App\Http\Resources\TeamResource;
 use App\Http\Traits\HttpResponses;
 use App\Models\Team;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+// use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class TeamsController extends Controller
 {
     use HttpResponses;
 
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index(Request $request)
     {
-        $result = Team::where('type', $request->type ?: 'general')
+        $teams = Team::where('type', $request->type ?: 'general')
             ->get();
-        if ($result->isEmpty()){
+
+        if ($teams->isEmpty()) {
             return response()->json([
-                'message' => 'No teams yet.'
+                'message' => 'no teams yet.'
             ], 404);
         }
+
         return response()->json([
-            'teams' => TeamsResource::collection($result)
+            'message' => 'success.',
+            'teams' => TeamResource::collection($teams)
         ], 200);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     */
+
     public function store(StoreTeamRequest $request)
     {
         if ($request->user()->team) {
             return response()->json([
-                'message' => 'User with ID: ' . $request->user()->id . ' already has a team.'
+                'message' => 'User with id: ' . $request->user()->id . ' already has a team id ' . $request->user()->team_id
             ], 403);
         }
 
-        $request->validated();
-
-        $team = Team::create([
-            'user_id' => $request->user()->id,
-            'name' => $request->name,
-            'body' => $request->body,
-            'type' => $request->type,
-        ]);
+        $team = $request->user()->team()->create($request->validated());
 
         return response()->json([
-            'message' => 'Created.',
-            'team' => new TeamsResource($team)
-        ],200);
+            'message' => 'team created.',
+            'team' => new TeamResource($team)
+        ], 200);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     */
-    public function show(int $id)
+
+    public function show(int $team_id)
     {
-        $team = Team::find($id);
-        if ($team){
+        $team = Team::find($team_id);
+
+        try {
             return response()->json([
-                'team' => new TeamsResource($team)
+                'team' => new TeamResource($team)
             ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'team not found.'
+            ], 404);
         }
-        return response()->json([
-            'message' => 'Team not found.'
-        ], 404);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param int $id
-     */
-    public function update(UpdateTeamRequest $request, int $id)
+
+    public function update(UpdateTeamRequest $request, int $team_id)
     {
-        $team = Team::find($id);
-        if ($team) {
+        $team = Team::find($team_id);
+
+        try {
             if ($this->isAuthorized($request, $team)) {
                 $team->update($request->validated());
                 return response()->json([
-                    'message' => 'Updated.',
-                    'team' => new TeamsResource($team)
+                    'message' => 'team updated.',
+                    'team' => new TeamResource($team)
                 ], 200);
+            } else {
+                return response()->json([
+                    'message' => 'unauthorized.'
+                ], 401);
             }
+        } catch (Exception $e) {
             return response()->json([
-                'message' => 'Unauthorized.'
-            ], 401);
+                'message' => 'team not found.'
+            ], 404);
         }
-
-        return response()->json([
-            'message' => 'Team Not Found.'
-        ], 404);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse|void
-     */
-    public function destroy(Request $request, int $id)
+
+    public function destroy(Request $request, int $team_id)
     {
-        $team = Team::find($id);
-        if ($team) {
+        $team = Team::find($team_id);
+
+        try {
             if ($this->isAuthorized($request, $team)) {
                 $team->delete();
                 return response()->json([
-                    'message' => 'Deleted.'
+                    'message' => 'team deleted.'
                 ], 200);
+            } else {
+                return response()->json([
+                    'message' => 'unauthorized.'
+                ], 401);
             }
+        } catch (Exception $e) {
             return response()->json([
-                'message' => 'Not Authorized.'
-            ], 401);
+                'message' => 'team not found.'
+            ], 404);
         }
-
-        return response()->json([
-            'message' => 'Team not found.'
-        ], 404);
     }
 
-    private function isAuthorized(Request $request = null, Team $team)
+    private function isAuthorized(Request $request = null, Team $team = null)
     {
-        return $request->user()->id === $team->user_id;
+        return $team ? $request->user()->id === $team->user_id : null;
     }
 }

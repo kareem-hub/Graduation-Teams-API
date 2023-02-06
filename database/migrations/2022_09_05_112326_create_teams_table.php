@@ -15,12 +15,14 @@ return new class extends Migration
     {
         Schema::create('teams', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->longText('body');
             $table->foreignId('user_id')
                 ->references('id')
                 ->on('users')
                 ->onDelete('cascade');
+            $table->string('title', 100)->unique();
+            $table->longText('body');
+            $table->string('type')->default('general');
+            $table->unique(['user_id', 'title', 'type']);
             $table->timestamps();
         });
     }

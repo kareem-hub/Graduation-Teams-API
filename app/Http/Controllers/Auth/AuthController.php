@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\LoginUserRequest;
 use App\Http\Requests\StoreUserRequest;
+use App\Http\Resources\UserResource;
 
 class AuthController extends Controller
 {
@@ -19,6 +20,8 @@ class AuthController extends Controller
 
     public function login(LoginUserRequest $request)
     {
+        $request->validated();
+
         if (!Auth::attempt($request->only(['email', 'password']))) {
             return response()->json([
                 'message' => 'Credentials do not match'
@@ -31,14 +34,15 @@ class AuthController extends Controller
         $user->tokens()->delete();
 
         return response()->json([
-            'user' => $user,
-            'team_id' => $user->team?->id,
+            'user' => new UserResource($user),
             'token' => $user->createToken('Token of ' . $user->name)->plainTextToken,
         ], 200);
     }
 
     public function register(StoreUserRequest $request)
     {
+        $request->validated();
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -46,7 +50,8 @@ class AuthController extends Controller
         ]);
 
         return response()->json([
-            'user' => $user,
+            'message' => 'user created.',
+            'user' => new UserResource($user),
             'token' => $user->createToken('Token of ' . $user->name)->plainTextToken
         ], 200);
     }
@@ -55,7 +60,7 @@ class AuthController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
         return response()->json([
-            'message' => 'Logged out.'
+            'message' => 'logged out.'
         ], 200);
     }
 }
