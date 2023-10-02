@@ -22,7 +22,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::post('teams', [TeamsController::class, 'store'])
         ->name('teams.create');
-    Route::post('teams/{team}', [TeamsController::class, 'update'])
+    Route::put('teams/{team}', [TeamsController::class, 'update'])
         ->name('teams.update');
     Route::delete('teams/{team}', [TeamsController::class, 'destroy'])
         ->name('teams.destroy');
