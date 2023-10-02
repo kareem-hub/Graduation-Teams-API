@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Teams;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTeamRequest;
@@ -10,13 +10,10 @@ use App\Http\Traits\HttpResponses;
 use App\Models\Team;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-// use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class TeamsController extends Controller
 {
     use HttpResponses;
-
 
     public function index(Request $request)
     {

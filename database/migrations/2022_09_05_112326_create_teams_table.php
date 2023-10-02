@@ -16,8 +16,7 @@ return new class extends Migration
         Schema::create('teams', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')
-                ->references('id')
-                ->on('users')
+                ->constrained()
                 ->onDelete('cascade');
             $table->string('title', 100)->unique();
             $table->longText('body');

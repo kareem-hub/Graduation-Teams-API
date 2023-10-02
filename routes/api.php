@@ -1,8 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\Teams\TeamsController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\TeamsController;
 use Illuminate\Support\Facades\Route;
 
 // public routes
@@ -10,8 +9,9 @@ Route::post('login', [AuthController::class, 'login'])
     ->name('login');
 Route::post('register', [AuthController::class, 'register'])
     ->name('register');
+
 Route::get('teams', [TeamsController::class, 'index'])
-    ->name('teams');
+    ->name('teams.index');
 Route::get('teams/{team_id}', [TeamsController::class, 'show'])
     ->name('teams.show');
 
@@ -19,6 +19,7 @@ Route::get('teams/{team_id}', [TeamsController::class, 'show'])
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('logout', [AuthController::class, 'logout'])
         ->name('logout');
+
     Route::post('teams', [TeamsController::class, 'store'])
         ->name('teams.create');
     Route::post('teams/{team}', [TeamsController::class, 'update'])
