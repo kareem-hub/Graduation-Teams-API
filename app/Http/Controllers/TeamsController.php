@@ -35,6 +35,7 @@ class TeamsController extends Controller
 
     public function store(StoreTeamRequest $request)
     {
+        // new comment for the new branch
         if ($request->user()->team) {
             return response()->json([
                 'message' => 'user already has a team'
