@@ -18,11 +18,17 @@ return new class extends Migration
             $table->foreignId('user_id')
                 ->constrained()
                 ->onDelete('cascade');
-            $table->string('title', 100)->unique();
-            $table->longText('body');
-            $table->string('type')->default('general');
-            $table->unique(['user_id', 'title', 'type']);
+            $table->foreignId('team_type_id')
+                ->constrained()
+                ->onDelete('cascade');
+            $table->string('title', 50)->unique();
+            $table->longText('body')->nullable();
+            $table->boolean('published')->default(true);
+            $table->unsignedSmallInteger('members')->default(0);
+            $table->unsignedSmallInteger('avg_rating')->nullable();
+            $table->unique(['user_id', 'title', 'team_type_id']);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
